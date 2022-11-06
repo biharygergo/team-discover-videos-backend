@@ -23,22 +23,31 @@ initializeQueue();
 const port = 8080; // default port to listen
 
 async function getProjectAndVersionId(req: Request) {
-  const projectId = req.params.projectId as string;
-  let versionId = req.query.versionId as string | undefined;
+  try {
+    const projectId = req.params.projectId as string;
+    let versionId = req.query.versionId as string | undefined;
 
-  // Default to the latest version
-  if (!versionId) {
-    versionId = await getLatestVersionId(projectId);
-    console.log("FOUND VERSION", versionId);
+    // Default to the latest version
+    if (!versionId) {
+      versionId = await getLatestVersionId(projectId);
+    }
+
+    // Reset version ID if original is explicitly requested
+    if (versionId === "original") {
+      versionId = undefined;
+    }
+
+    return { projectId, versionId };
+  } catch (e) {
+    console.error(e);
+    return { projectId: "", versionId: "" };
   }
-
-  // Reset version ID if original is explicitly requested
-  if (versionId === "original") {
-    versionId = undefined;
-  }
-
-  return { projectId, versionId };
 }
+
+app.get("/api/redirect", (req, res) => {
+    return res.redirect("https://bit.ly/TeamDiscover");
+})
+
 // define a route handler for the default home page
 app.get("/api/projects/:projectId", async (req, res) => {
   const { projectId, versionId } = await getProjectAndVersionId(req);
@@ -108,6 +117,7 @@ app.get("/api/assets", async (req, res) => {
     catalog.push({
       id: assetId,
       imageUrl: `/api/assets/images/${assetId}`,
+      thumbnailUrl: `/api/assets/images/${assetId}`,
       type: "image",
     });
   });
@@ -117,6 +127,7 @@ app.get("/api/assets", async (req, res) => {
     catalog.push({
       id: assetId,
       imageUrl: `/api/assets/music/${assetId}`,
+      thumbnailUrl: `/api/assets/thumbnails/soundWave`,
       type: "audio",
     });
   });
@@ -124,59 +135,75 @@ app.get("/api/assets", async (req, res) => {
   return res.json(catalog);
 });
 app.get("/api/assets/videos/:assetId", async (req, res) => {
-  const assetId = req.params.assetId as string;
-  const filePath = join(PATH_TO_ASSETS, "videos", `${assetId}.mp4`);
-  const fileStat = await stat(filePath);
+  try {
+    const assetId = req.params.assetId as string;
+    const filePath = join(PATH_TO_ASSETS, "videos", `${assetId}.mp4`);
+    const fileStat = await stat(filePath);
 
-  res.writeHead(200, {
-    "Content-Type": "video/mp4",
-    "Content-Length": fileStat.size,
-  });
+    res.writeHead(200, {
+      "Content-Type": "video/mp4",
+      "Content-Length": fileStat.size,
+    });
 
-  const readStream = createReadStream(filePath);
-  readStream.pipe(res);
+    const readStream = createReadStream(filePath);
+    readStream.pipe(res);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 app.get("/api/assets/images/:assetId", async (req, res) => {
-  const assetId = req.params.assetId as string;
-  const filePath = join(PATH_TO_ASSETS, "images", `${assetId}.png`);
-  const fileStat = await stat(filePath);
+  try {
+    const assetId = req.params.assetId as string;
+    const filePath = join(PATH_TO_ASSETS, "images", `${assetId}.jpeg`);
+    const fileStat = await stat(filePath);
 
-  res.writeHead(200, {
-    "Content-Type": "image/png",
-    "Content-Length": fileStat.size,
-  });
+    res.writeHead(200, {
+      "Content-Type": "image/jpeg",
+      "Content-Length": fileStat.size,
+    });
 
-  const readStream = createReadStream(filePath);
-  readStream.pipe(res);
+    const readStream = createReadStream(filePath);
+    readStream.pipe(res);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 app.get("/api/assets/thumbnails/:assetId", async (req, res) => {
-  const assetId = req.params.assetId as string;
-  const filePath = join(PATH_TO_ASSETS, "thumbnails", `${assetId}.jpg`);
-  const fileStat = await stat(filePath);
+  try {
+    const assetId = req.params.assetId as string;
+    const filePath = join(PATH_TO_ASSETS, "thumbnails", `${assetId}.jpg`);
+    const fileStat = await stat(filePath);
 
-  res.writeHead(200, {
-    "Content-Type": "image/jpeg",
-    "Content-Length": fileStat.size,
-  });
+    res.writeHead(200, {
+      "Content-Type": "image/jpeg",
+      "Content-Length": fileStat.size,
+    });
 
-  const readStream = createReadStream(filePath);
-  readStream.pipe(res);
+    const readStream = createReadStream(filePath);
+    readStream.pipe(res);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 app.get("/api/assets/music/:assetId", async (req, res) => {
-  const assetId = req.params.assetId as string;
-  const filePath = join(PATH_TO_ASSETS, "music", `${assetId}.mp3`);
-  const fileStat = await stat(filePath);
+  try {
+    const assetId = req.params.assetId as string;
+    const filePath = join(PATH_TO_ASSETS, "music", `${assetId}.mp3`);
+    const fileStat = await stat(filePath);
 
-  res.writeHead(200, {
-    "Content-Type": "audio/mpeg",
-    "Content-Length": fileStat.size,
-  });
+    res.writeHead(200, {
+      "Content-Type": "audio/mpeg",
+      "Content-Length": fileStat.size,
+    });
 
-  const readStream = createReadStream(filePath);
-  readStream.pipe(res);
+    const readStream = createReadStream(filePath);
+    readStream.pipe(res);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

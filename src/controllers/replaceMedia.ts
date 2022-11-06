@@ -3,10 +3,10 @@ import { overlapsIntervalFrames } from "../utils/time";
 import { getChild } from "../utils/xml";
 import { EditorCommand, PATH_TO_DATA } from "./projects";
 
-const videoExtensions = [".MOV, .mov, .mp4"];
+const videoExtensions = [".MOV", ".mov", ".mp4"];
 const imageExtensions = [".jpg", ".jpeg", ".png", ".JPG", ".JPEG"];
 
-const imageExtension = ".png";
+const imageExtension = ".jpeg";
 const videoExtension = ".mp4";
 
 export function replaceMedia(
@@ -38,6 +38,18 @@ export function replaceMedia(
 
     const allowedExtensions =
       mediaType === "video" ? videoExtensions : imageExtensions;
+
+      console.log(allowedExtensions)
+    console.log(
+      existingExtension,
+      start,
+      end,
+      command.time,
+      overlapsIntervalFrames(start, end, command.time),
+      allowedExtensions.includes(existingExtension),
+      mediaType
+    );
+
     if (
       !overlapsIntervalFrames(start, end, command.time) ||
       !allowedExtensions.includes(existingExtension)

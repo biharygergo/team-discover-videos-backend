@@ -52,6 +52,8 @@ export async function runCommand(
   let updatedProject;
   let success = false;
 
+  console.log('EXECUTING COMMAND', projectId, command.action, command.type, command.value, command.time);
+
   switch (command.action) {
     case "replace":
       switch (command.type) {
@@ -105,6 +107,8 @@ export async function runCommand(
     await generateVideo(savedPath, projectId);
   }
 
+  console.log('COMMAND RESULT', projectId, command.action, command.type, success);
+
   return { success, updatedProject };
 }
 
@@ -156,5 +160,6 @@ export async function createSandboxProject() {
   await setProjectName(sandboxProject, sandboxId);
   await writeFile(pathToNewSandboxXml, buildXml(sandboxProject));
 
+  await generateVideo(pathToNewSandboxXml, sandboxId);
   return sandboxId;
 }

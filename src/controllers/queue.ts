@@ -66,8 +66,9 @@ export function initializeQueue() {
       .pop()!
       .split("@");
 
-    InMemoryVideoStore.addNewVideo(projectId, path);
-    InMemoryVideoStore.setVideoStatus(projectId, "done");
-
+    setTimeout(() => {
+      InMemoryVideoStore.addNewVideo(projectId, path);
+      InMemoryVideoStore.setVideoStatus(projectId, "done");
+    }, 4000);
   });
 }
