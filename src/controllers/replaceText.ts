@@ -50,7 +50,6 @@ export function replaceText(project: any, command: EditorCommand) {
 
   const textValueParameter = findMatchingTextNode(project, command);
   if (textValueParameter) {
-    console.log("Found text value");
     const value = getChild("value", textValueParameter.parameter);
     const updatedValue = replaceEncodedText(
       value[0]["#text"],

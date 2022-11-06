@@ -24,10 +24,8 @@ export function replaceMedia(
   const tracks = getChild("track", video);
   const videoTrack = tracks[0].track;
 
-  console.log(videoTrack)
   const clipItems = getChild("clipitem", videoTrack, true);
   clipItems?.forEach((clipItem: any) => {
-    console.log(clipItem.clipitem)
     const file = getChild("file", clipItem.clipitem);
     if (!file) return;
 
@@ -40,17 +38,6 @@ export function replaceMedia(
 
     const allowedExtensions =
       mediaType === "video" ? videoExtensions : imageExtensions;
-
-      console.log(allowedExtensions)
-    console.log(
-      existingExtension,
-      start,
-      end,
-      command.time,
-      overlapsIntervalFrames(start, end, command.time),
-      allowedExtensions.includes(existingExtension),
-      mediaType
-    );
 
     if (
       !overlapsIntervalFrames(start, end, command.time) ||

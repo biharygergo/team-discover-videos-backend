@@ -20,7 +20,6 @@ export function replaceAudio(
     const audioTrack = track.track;
     const clipItems = getChild("clipitem", audioTrack, true);
     clipItems?.forEach((clipItem: any) => {
-      console.log(clipItem);
       const file = getChild("file", clipItem.clipitem);
       if (!file || !JSON.parse(JSON.stringify(file))) return;
 
@@ -46,14 +45,12 @@ export function replaceAudio(
       foundAudioToReplace = true;
 
       try {
-        console.log("name", name);
         name[0] = { "#text": nameWithExtension };
 
         const fileName = getChild("name", file);
         fileName[0] = { "#text": nameWithExtension };
 
         const filePath = getChild("pathurl", file);
-        console.log("filepath", filePath);
 
         const pathToAssets =
           "file://localhost" +
