@@ -72,7 +72,6 @@ app.get("/api/projects/:projectId/video", async (req, res) => {
       return res.json(videoItem);
     } else {
       const fileStat = await stat(videoItem.latestFile);
-
       res.writeHead(200, {
         "Content-Type": "video/mp4",
         "Content-Length": fileStat.size,
@@ -83,6 +82,9 @@ app.get("/api/projects/:projectId/video", async (req, res) => {
     }
   } catch (e) {
     console.error(e);
+    const { projectId, versionId } = await getProjectAndVersionId(req);
+    console.log(InMemoryVideoStore.getItem(projectId));
+    console.log(InMemoryVideoStore.store);
     return res
       .status(500)
       .json({ message: "Oh oh, that does not seem to work!" });

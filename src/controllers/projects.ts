@@ -157,9 +157,10 @@ export async function createSandboxProject() {
   );
 
   const sandboxProject = await getProject("sandbox");
-  await setProjectName(sandboxProject, sandboxId);
-  await writeFile(pathToNewSandboxXml, buildXml(sandboxProject));
+  const savedPath = await saveUpdatedProject(sandboxProject, sandboxId);
+  // await setProjectName(sandboxProject, sandboxId);
+  // await writeFile(pathToNewSandboxXml, buildXml(sandboxProject));
 
-  await generateVideo(pathToNewSandboxXml, sandboxId);
+  await generateVideo(savedPath, sandboxId);
   return sandboxId;
 }

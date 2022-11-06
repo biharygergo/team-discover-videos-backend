@@ -13,18 +13,23 @@ interface VideoStoreItem {
 }
 
 export class VideoStore {
-  private store: {
+  store: {
     [projectId: string]: VideoStoreItem;
   } = {};
 
   constructor() {
     const files = readdirSync(PATH_TO_QUEUE);
     files.forEach((path) => {
-      const [projectId, versionIdWithExtension] = path
+      let [projectId, versionIdWithExtension] = path
         .split("/")
         .pop()!
         .split("@");
+      
+      if (projectId.includes('.')) {
+        projectId = projectId.split('.')[0];
+      }
 
+      console.log(projectId)
       this.addNewVideo(projectId, join(PATH_TO_QUEUE, path));
     });
   }
