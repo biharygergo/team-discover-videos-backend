@@ -24,8 +24,10 @@ export function replaceMedia(
   const tracks = getChild("track", video);
   const videoTrack = tracks[0].track;
 
+  console.log(videoTrack)
   const clipItems = getChild("clipitem", videoTrack, true);
   clipItems?.forEach((clipItem: any) => {
+    console.log(clipItem.clipitem)
     const file = getChild("file", clipItem.clipitem);
     if (!file) return;
 

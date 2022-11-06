@@ -45,33 +45,47 @@ async function getProjectAndVersionId(req: Request) {
 }
 
 app.get("/api/redirect", (req, res) => {
-    return res.redirect("https://bit.ly/TeamDiscover");
-})
+  return res.redirect("https://bit.ly/TeamDiscover");
+});
 
 // define a route handler for the default home page
 app.get("/api/projects/:projectId", async (req, res) => {
-  const { projectId, versionId } = await getProjectAndVersionId(req);
-  const projectData = await getProject(projectId, versionId);
-  return res.send({ project: buildXml(projectData) });
+  try {
+    const { projectId, versionId } = await getProjectAndVersionId(req);
+    const projectData = await getProject(projectId, versionId);
+    return res.send({ project: buildXml(projectData) });
+  } catch (e) {
+    console.error(e);
+    return res
+      .status(500)
+      .json({ message: "Oh oh, that does not seem to work!" });
+  }
 });
 
 app.get("/api/projects/:projectId/video", async (req, res) => {
-  const { projectId, versionId } = await getProjectAndVersionId(req);
-  const videoItem = InMemoryVideoStore.getItem(projectId);
-  const media = req.query.media as string | undefined;
+  try {
+    const { projectId, versionId } = await getProjectAndVersionId(req);
+    const videoItem = InMemoryVideoStore.getItem(projectId);
+    const media = req.query.media as string | undefined;
 
-  if (!media) {
-    return res.json(videoItem);
-  } else {
-    const fileStat = await stat(videoItem.latestFile);
+    if (!media) {
+      return res.json(videoItem);
+    } else {
+      const fileStat = await stat(videoItem.latestFile);
 
-    res.writeHead(200, {
-      "Content-Type": "video/mp4",
-      "Content-Length": fileStat.size,
-    });
+      res.writeHead(200, {
+        "Content-Type": "video/mp4",
+        "Content-Length": fileStat.size,
+      });
 
-    const readStream = createReadStream(videoItem.latestFile);
-    readStream.pipe(res);
+      const readStream = createReadStream(videoItem.latestFile);
+      readStream.pipe(res);
+    }
+  } catch (e) {
+    console.error(e);
+    return res
+      .status(500)
+      .json({ message: "Oh oh, that does not seem to work!" });
   }
 });
 
