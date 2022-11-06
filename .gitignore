@@ -2,3 +2,4 @@ src/data
 service_account.json
 node_modules
 dist
+service_account.json

@@ -1,4 +1,4 @@
-import express, { Request } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import {
   createSandboxProject,
@@ -67,13 +67,20 @@ app.get("/api/projects/:projectId/video", async (req, res) => {
 });
 
 app.put("/api/projects/:projectId", async (req, res) => {
-  const { projectId, versionId } = await getProjectAndVersionId(req);
-  const command = req.body;
-  const result = await runCommand(command, projectId, versionId);
-  return res.send({
-    updatedProject: buildXml(result.updatedProject),
-    success: result.success,
-  });
+  try {
+    const { projectId, versionId } = await getProjectAndVersionId(req);
+    const command = req.body;
+    const result = await runCommand(command, projectId, versionId);
+    return res.send({
+      updatedProject: buildXml(result.updatedProject),
+      success: result.success,
+    });
+  } catch (e) {
+    console.error(e);
+    return res
+      .status(500)
+      .json({ message: "Oh oh, that does not seem to work!" });
+  }
 });
 
 app.post("/api/projects", async (req, res) => {
@@ -157,6 +164,7 @@ app.get("/api/assets/thumbnails/:assetId", async (req, res) => {
   const readStream = createReadStream(filePath);
   readStream.pipe(res);
 });
+
 app.get("/api/assets/music/:assetId", async (req, res) => {
   const assetId = req.params.assetId as string;
   const filePath = join(PATH_TO_ASSETS, "music", `${assetId}.mp3`);
@@ -169,6 +177,13 @@ app.get("/api/assets/music/:assetId", async (req, res) => {
 
   const readStream = createReadStream(filePath);
   readStream.pipe(res);
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  return res
+    .status(500)
+    .json({ message: "Oh oh, that does not seem to work!" });
 });
 
 // start the Express server
